@@ -1,1 +1,16 @@
-Websocket here we go!
+<html>
+  <head></head>
+  <body>
+    Websocket here we go!
+  </body>
+
+  <script>
+    let ws;
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    ws = new WebSocket(`${protocol}//${window.location.host}`);
+
+    ws.onmessage = function (event) {
+      console.log("Received:", event.data);
+    };
+  </script>
+</html>

@@ -13,9 +13,8 @@ server.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
 /** Websocket setup */
-const WebSocket = require("ws").Server;
-
-const wss = new WebSocket({ server: server });
+const WebSocket = require("ws");
+const wss = new WebSocket.Server({ server });
 
 wss.on("connection", function connection(ws) {
   const numClients = wss.clients.size;
