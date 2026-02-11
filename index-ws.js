@@ -15,30 +15,14 @@ server.listen(3000, () => {
 /** Websocket setup */
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ server });
-// process.on("SIGINT", () => {
-//   wss.clients.forEach(function each(client) {
-//     client.close();
-//   });
-//   server.close(() => {
-//     shutdownDB();
-//   });
-// });
 process.on("SIGINT", () => {
-  console.log("Shutting down...");
-
-  wss.clients.forEach((client) => {
-    client.terminate();
+  wss.clients.forEach(function each(client) {
+    client.close();
   });
 
-  wss.close(() => {
-    console.log("WebSocket server closed.");
-
-    server.close(() => {
-      console.log("HTTP server closed.");
-
-      shutdownDB();
-      process.exit(0);
-    });
+  console.log("Shutting down db");
+  shutdownDB(() => {
+    process.exit(0);
   });
 });
 
@@ -82,18 +66,26 @@ db.serialize(() => {
         `);
 });
 
-function getCounts() {
-  db.each("SELECT * FROM visitors", (err, row) => {
-    console.log(row);
-  });
+function getCounts(done) {
+  db.each(
+    "SELECT * FROM visitors",
+    (err, row) => {
+      if (err) console.error(err);
+      else console.log(row);
+    },
+    (err) => {
+      if (err) console.error(err);
+      if (done) done();
+    }
+  );
 }
 
-function shutdownDB() {
-  getCounts();
-  db.close((err) => {
-    if (err) {
-      console.error(err.message);
-    }
-    console.log("Closed the database connection.");
+function shutdownDB(done) {
+  getCounts(() => {
+    db.close((err) => {
+      if (err) console.error(err.message);
+      else console.log("Closed the database connection.");
+      if (done) done();
+    });
   });
 }
