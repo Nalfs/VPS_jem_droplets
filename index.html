@@ -2,6 +2,7 @@
   <head></head>
   <body>
     Websocket here we go!
+    <div id="output"></div>
   </body>
 
   <script>
@@ -11,6 +12,8 @@
 
     ws.onmessage = function (event) {
       console.log("Received:", event.data);
+      const outputDiv = document.getElementById("output");
+      outputDiv.textContent = event.data;
     };
   </script>
 </html>

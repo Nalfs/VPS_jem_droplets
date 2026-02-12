@@ -16,7 +16,7 @@ server.listen(3000, () => {
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ server });
 process.on("SIGINT", () => {
-  wss.clients.forEach(function each(client) {
+    wss.clients.forEach(function each(client) {
     client.close();
   });
 
@@ -28,8 +28,17 @@ process.on("SIGINT", () => {
 
 wss.on("connection", function connection(ws) {
   const numClients = wss.clients.size;
-  console.log(`New client connected. Total clients: ${numClients}`);
-  wss.broadcast(`A new client has connected. Total clients: ${numClients}`);
+  db.get("SELECT COUNT(*) AS total FROM visitors", (err, row) => {
+    if (err) console.error(err);
+    const totalRecords = row.total;
+    console.log(
+      `New client connected. Total clients: ${numClients} & records: ${totalRecords}`
+    );
+    wss.broadcast(
+      `A new client has connected. Total clients: ${numClients} & records: ${totalRecords}`
+    );
+  });
+
   if (ws.readyState === WebSocket.OPEN) {
     ws.send("Welcome to the WebSocket server!");
   }
